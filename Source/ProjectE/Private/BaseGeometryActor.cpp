@@ -2,6 +2,9 @@
 
 
 #include "BaseGeometryActor.h"
+#include "Engine/Engine.h"
+
+DEFINE_LOG_CATEGORY( LogBaseGeometry )
 
 // Sets default values
 ABaseGeometryActor::ABaseGeometryActor()
@@ -32,14 +35,29 @@ void ABaseGeometryActor::Print()
 	UE_LOG( LogTemp, Warning, TEXT( "Unreal!" ) );
 	UE_LOG( LogTemp, Error, TEXT( "Unreal!" ) );
 
-	int intTest = 4;
+	int health = 4;
 	float percents = 56.3465;
-	bool isTest = true;
+	bool isDead = true;
 
-	UE_LOG( LogTemp,
+	UE_LOG( LogBaseGeometry,
 			Display,
-			TEXT( "intTest: %i, percent: %.2f, percentFull: %f, isTest: %i" ),
-			intTest, percents, percents, isTest
+			TEXT( "health: %i, percent: %.2f, percentFull: %f, isTest: %i" ),
+			health, percents, percents, isDead
 	);
-}
 
+	const FString name = "Sara Connor";
+
+	const FString healthStr = "Health = " + FString::FromInt(health);
+	const FString percentsStr = "Percents = " + FString::SanitizeFloat( percents );
+	const FString isDeadStr = "IsDead = " + FString( isDead ? "true" : "false" );
+
+	const FString stat = FString::Printf( TEXT("%s \n%s \n%s \n%s"), *name, *healthStr, *percentsStr, *isDeadStr );
+
+	// Логируем сообщение в консоли
+	UE_LOG( LogBaseGeometry, Warning, TEXT("%s"), *stat);
+
+	// Логируем сообщение на экране
+	GEngine->AddOnScreenDebugMessage( -1, 2.0f, FColor::Black, stat );
+
+	GEngine->AddOnScreenDebugMessage( -1, 4.0f, FColor::Red, stat, true, FVector2D( 1.5f, 1.5f ) );
+}
