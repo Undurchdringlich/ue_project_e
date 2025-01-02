@@ -21,6 +21,18 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, Category = "Stats")
+	int32 health;
+
+	UPROPERTY(EditDefaultsOnly)
+	int32 damage;
+
+	UPROPERTY(EditInstanceOnly)
+	float percents;
+
+	UPROPERTY(VisibleAnywhere)
+	bool isDead;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

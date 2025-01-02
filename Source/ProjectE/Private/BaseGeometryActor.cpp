@@ -7,7 +7,7 @@
 DEFINE_LOG_CATEGORY( LogBaseGeometry )
 
 // Sets default values
-ABaseGeometryActor::ABaseGeometryActor()
+ABaseGeometryActor::ABaseGeometryActor() : health( 4 ), damage( 23 ), percents( 56.3465 ), isDead( false )
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -34,10 +34,6 @@ void ABaseGeometryActor::Print()
 	UE_LOG( LogTemp, Display, TEXT( "Unreal!" ) );
 	UE_LOG( LogTemp, Warning, TEXT( "Unreal!" ) );
 	UE_LOG( LogTemp, Error, TEXT( "Unreal!" ) );
-
-	int health = 4;
-	float percents = 56.3465;
-	bool isDead = true;
 
 	UE_LOG( LogBaseGeometry,
 			Display,
