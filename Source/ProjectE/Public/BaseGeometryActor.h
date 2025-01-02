@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "BaseGeometryActor.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN( LogBaseGeometry, Log, All )
+
 UCLASS()
 class PROJECTE_API ABaseGeometryActor : public AActor
 {
