@@ -7,7 +7,7 @@
 DEFINE_LOG_CATEGORY( LogBaseGeometry )
 
 // Sets default values
-ABaseGeometryActor::ABaseGeometryActor() : amplitude( 50.0f ), frequency( 2.0f ), health( 4 ), damage( 23 ), percents( 56.3465f ), isDead( false )
+ABaseGeometryActor::ABaseGeometryActor() : health( 4 ), damage( 23 ), percents( 56.3465f ), isDead( false )
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -24,7 +24,7 @@ void ABaseGeometryActor::BeginPlay()
 	InitLocation = GetActorLocation();
 	
 	//Print();
-	PrintTransform();
+	//PrintTransform();
 }
 
 // Called every frame
@@ -32,12 +32,7 @@ void ABaseGeometryActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Реализовали движение актора по оси Z
-	FVector current_location = GetActorLocation();
-	float time = GetWorld()->GetTimeSeconds();
-	current_location.Z = InitLocation.Z + amplitude * FMath::Sin( frequency * time );
-
-	SetActorLocation( current_location );
+	HandleMovement();
 }
 
 void ABaseGeometryActor::Print()
@@ -84,4 +79,17 @@ void ABaseGeometryActor::PrintTransform()
 	UE_LOG( LogBaseGeometry, Warning, TEXT( "Scale: %s" ), *scale.ToString() );
 
 	UE_LOG( LogBaseGeometry, Error, TEXT( "Human transform: %s" ), *transform.ToHumanReadableString() );
+}
+
+void ABaseGeometryActor::HandleMovement()
+{
+	if( GeometryData.MovementType == EMovementType::Sin )
+	{
+		// Реализовали движение актора по оси Z
+		FVector CurrentLocation = GetActorLocation();
+		const float Time = GetWorld()->GetTimeSeconds();
+		CurrentLocation.Z = InitLocation.Z + GeometryData.amplitude * FMath::Sin( GeometryData.frequency * Time );
+
+		SetActorLocation( CurrentLocation );
+	}
 }
