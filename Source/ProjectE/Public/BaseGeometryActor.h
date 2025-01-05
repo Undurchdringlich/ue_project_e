@@ -21,7 +21,7 @@ struct FGeometryData
 {
 	GENERATED_USTRUCT_BODY()
 
-	FGeometryData() : MovementType( EMovementType::Static ), amplitude( 50.0f ), frequency( 2.0f ) {}
+	FGeometryData() : MovementType( EMovementType::Static ), amplitude( 50.0f ), frequency( 2.0f ), Color( FLinearColor::Black ) {}
 
 	UPROPERTY( EditAnywhere, Category = "Movement" )
 	EMovementType MovementType;
@@ -31,6 +31,9 @@ struct FGeometryData
 
 	UPROPERTY( EditAnywhere, Category = "Movement" )
 	float frequency;
+
+	UPROPERTY( EditAnywhere, Category = "Design" )
+	FLinearColor Color;
 };
 
 UCLASS()
@@ -43,7 +46,7 @@ public:
 	ABaseGeometryActor();
 
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* baseMesh;
+	UStaticMeshComponent* BaseMesh;
 
 protected:
 	// Called when the game starts or when spawned
@@ -73,4 +76,5 @@ private:
 	void Print();
 	void PrintTransform();
 	void HandleMovement();
+	void SetColor( const FLinearColor& color );
 };
