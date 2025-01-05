@@ -3,6 +3,7 @@
 
 #include "BaseGeometryActor.h"
 #include "Engine/Engine.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 DEFINE_LOG_CATEGORY( LogBaseGeometry )
 
@@ -12,8 +13,8 @@ ABaseGeometryActor::ABaseGeometryActor() : health( 4 ), damage( 23 ), percents( 
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	baseMesh = CreateDefaultSubobject<UStaticMeshComponent>( "BaseMesh");
-	SetRootComponent(baseMesh);
+	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>( "BaseMesh");
+	SetRootComponent(BaseMesh);
 }
 
 // Called when the game starts or when spawned
@@ -25,6 +26,8 @@ void ABaseGeometryActor::BeginPlay()
 	
 	//Print();
 	//PrintTransform();
+
+	SetColor( GeometryData.Color );
 }
 
 // Called every frame
@@ -92,4 +95,10 @@ void ABaseGeometryActor::HandleMovement()
 
 		SetActorLocation( CurrentLocation );
 	}
+}
+
+void ABaseGeometryActor::SetColor( const FLinearColor& color )
+{
+	if( UMaterialInstanceDynamic* DynMaterial = BaseMesh->CreateAndSetMaterialInstanceDynamic( 0 ) )
+		DynMaterial->SetVectorParameterValue( "Color", color );
 }
