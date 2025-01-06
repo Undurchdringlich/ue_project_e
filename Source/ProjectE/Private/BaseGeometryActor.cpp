@@ -14,8 +14,28 @@ ABaseGeometryActor::ABaseGeometryActor() : health( 4 ), damage( 23 ), percents( 
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>( "BaseMesh");
-	SetRootComponent(BaseMesh);
+	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>( "BaseMesh" );
+	if( BaseMesh )
+		SetRootComponent(BaseMesh);
+}
+
+void ABaseGeometryActor::SetGeometryData( const FGeometryData& NewGeometryData )
+{
+	// Если поменялся параметр TimerRate, то обновим таймер
+	if( GeometryData.TimerRate != NewGeometryData.TimerRate )
+		UpdateTimerRate( NewGeometryData.TimerRate );
+
+	GeometryData = NewGeometryData;
+}
+
+void ABaseGeometryActor::UpdateTimerRate( const float NewTimerRate )
+{
+	FTimerManager& TimerManager = GetWorldTimerManager();
+
+	if( NewTimerRate )
+		TimerManager.SetTimer( TimerHandle, this, &ABaseGeometryActor::OnTimerFire, NewTimerRate, true );
+	else
+		TimerManager.ClearTimer( TimerHandle );
 }
 
 // Called when the game starts or when spawned
@@ -30,7 +50,7 @@ void ABaseGeometryActor::BeginPlay()
 
 	SetColor( GeometryData.Color );
 
-	GetWorldTimerManager().SetTimer( TimerHandle, this, &ABaseGeometryActor::OnTimerFire,  GeometryData.TimerRate, true );
+	UpdateTimerRate( GeometryData.TimerRate );
 }
 
 // Called every frame
@@ -65,9 +85,11 @@ void ABaseGeometryActor::Print()
 	UE_LOG( LogBaseGeometry, Warning, TEXT("%s"), *stat);
 
 	// Логируем сообщение на экране
-	GEngine->AddOnScreenDebugMessage( -1, 2.0f, FColor::Black, stat );
-
-	GEngine->AddOnScreenDebugMessage( -1, 4.0f, FColor::Red, stat, true, FVector2D( 1.5f, 1.5f ) );
+	if( GEngine )
+	{
+		GEngine->AddOnScreenDebugMessage( -1, 2.0f, FColor::Black, stat );
+		GEngine->AddOnScreenDebugMessage( -1, 4.0f, FColor::Red, stat, true, FVector2D( 1.5f, 1.5f ) );
+	}
 }
 
 void ABaseGeometryActor::PrintTransform()
@@ -89,7 +111,7 @@ void ABaseGeometryActor::PrintTransform()
 
 void ABaseGeometryActor::HandleMovement()
 {
-	if( GeometryData.MovementType == EMovementType::Sin )
+	if( UWorld* World = GetWorld(); World && GeometryData.MovementType == EMovementType::Sin )
 	{
 		// Реализовали движение актора по оси Z
 		FVector CurrentLocation = GetActorLocation();
@@ -102,8 +124,14 @@ void ABaseGeometryActor::HandleMovement()
 
 void ABaseGeometryActor::SetColor( const FLinearColor& color )
 {
-	if( UMaterialInstanceDynamic* DynMaterial = BaseMesh->CreateAndSetMaterialInstanceDynamic( 0 ) )
-		DynMaterial->SetVectorParameterValue( "Color", color );
+	if( !BaseMesh )
+		return;
+
+	UMaterialInstanceDynamic* DynMaterial = BaseMesh->CreateAndSetMaterialInstanceDynamic( 0 );
+	if( !DynMaterial )
+		return;
+
+	DynMaterial->SetVectorParameterValue( "Color", color );
 }
 
 void ABaseGeometryActor::OnTimerFire()
