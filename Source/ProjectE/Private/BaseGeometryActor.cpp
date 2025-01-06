@@ -4,6 +4,7 @@
 #include "BaseGeometryActor.h"
 #include "Engine/Engine.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "TimerManager.h"
 
 DEFINE_LOG_CATEGORY( LogBaseGeometry )
 
@@ -28,6 +29,8 @@ void ABaseGeometryActor::BeginPlay()
 	//PrintTransform();
 
 	SetColor( GeometryData.Color );
+
+	GetWorldTimerManager().SetTimer( TimerHandle, this, &ABaseGeometryActor::OnTimerFire,  GeometryData.TimerRate, true );
 }
 
 // Called every frame
@@ -101,4 +104,10 @@ void ABaseGeometryActor::SetColor( const FLinearColor& color )
 {
 	if( UMaterialInstanceDynamic* DynMaterial = BaseMesh->CreateAndSetMaterialInstanceDynamic( 0 ) )
 		DynMaterial->SetVectorParameterValue( "Color", color );
+}
+
+void ABaseGeometryActor::OnTimerFire()
+{
+	const FLinearColor NewColor = FLinearColor::MakeRandomColor();
+	SetColor( NewColor );
 }
