@@ -51,6 +51,9 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* BaseMesh;
 
+	void SetGeometryData( const FGeometryData& NewGeometryData );
+	void UpdateTimerRate( const float NewTimerRate );
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
