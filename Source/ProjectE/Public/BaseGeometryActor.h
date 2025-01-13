@@ -7,7 +7,10 @@
 #include "Components/StaticMeshComponent.h"
 #include "BaseGeometryActor.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN( LogBaseGeometry, Log, All )
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams( FOnColorChanged, const FLinearColor&, Color, const FString&, Name );
+DECLARE_MULTICAST_DELEGATE_OneParam( FOnTimerFinished, AActor* );
+
+DECLARE_LOG_CATEGORY_EXTERN( LogBaseGeometry, All, All )
 
 UENUM(BlueprintType)
 enum class EMovementType : uint8
@@ -23,16 +26,16 @@ struct FGeometryData
 
 	FGeometryData() : MovementType( EMovementType::Static ), amplitude( 50.0f ), frequency( 2.0f ), Color( FLinearColor::Black ), TimerRate( 3.0f ) {}
 
-	UPROPERTY( EditAnywhere, Category = "Movement" )
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Movement" )
 	EMovementType MovementType;
 
-	UPROPERTY( EditAnywhere, Category = "Movement" )
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Movement" )
 	float amplitude;
 
-	UPROPERTY( EditAnywhere, Category = "Movement" )
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Movement" )
 	float frequency;
 
-	UPROPERTY( EditAnywhere, Category = "Design" )
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Design" )
 	FLinearColor Color;
 
 	UPROPERTY( EditAnywhere, Category = "Design" )
@@ -51,26 +54,37 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* BaseMesh;
 
-	void SetGeometryData( const FGeometryData& NewGeometryData );
 	void UpdateTimerRate( const float NewTimerRate );
+
+	void SetGeometryData( const FGeometryData& NewGeometryData );
+
+	UFUNCTION(BlueprintCallable)
+	FGeometryData GetGeometryData() const;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnColorChanged OnColorChanged;
+
+	FOnTimerFinished OnTimerFinished;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere)
+	virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite )
 	FGeometryData GeometryData;
 
-	UPROPERTY(EditAnywhere, Category = "Stats")
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = "Stats" )
 	int32 health;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY( EditDefaultsOnly, BlueprintReadWrite )
 	int32 damage;
 
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY( EditInstanceOnly, BlueprintReadWrite )
 	float percents;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY( VisibleAnywhere, BlueprintReadWrite )
 	bool isDead;
 
 public:	
@@ -80,6 +94,9 @@ public:
 private:
 	FVector InitLocation;
 	FTimerHandle TimerHandle;
+
+	uint32 TimerCount = 0;
+	uint32 MaxTimerCount = 5;
 
 	void Print();
 	void PrintTransform();

@@ -28,14 +28,9 @@ void ABaseGeometryActor::SetGeometryData( const FGeometryData& NewGeometryData )
 	GeometryData = NewGeometryData;
 }
 
-void ABaseGeometryActor::UpdateTimerRate( const float NewTimerRate )
+FGeometryData ABaseGeometryActor::GetGeometryData() const
 {
-	FTimerManager& TimerManager = GetWorldTimerManager();
-
-	if( NewTimerRate )
-		TimerManager.SetTimer( TimerHandle, this, &ABaseGeometryActor::OnTimerFire, NewTimerRate, true );
-	else
-		TimerManager.ClearTimer( TimerHandle );
+	return GeometryData;
 }
 
 // Called when the game starts or when spawned
@@ -51,6 +46,13 @@ void ABaseGeometryActor::BeginPlay()
 	SetColor( GeometryData.Color );
 
 	UpdateTimerRate( GeometryData.TimerRate );
+}
+
+void ABaseGeometryActor::EndPlay( const EEndPlayReason::Type EndPlayReason )
+{
+	UE_LOG( LogBaseGeometry, Error, TEXT( "Actor %s has been destroy" ), *GetName() );
+
+	Super::EndPlay( EndPlayReason );
 }
 
 // Called every frame
@@ -134,8 +136,27 @@ void ABaseGeometryActor::SetColor( const FLinearColor& color )
 	DynMaterial->SetVectorParameterValue( "Color", color );
 }
 
+void ABaseGeometryActor::UpdateTimerRate( const float NewTimerRate )
+{
+	FTimerManager& TimerManager = GetWorldTimerManager();
+
+	if( NewTimerRate )
+		TimerManager.SetTimer( TimerHandle, this, &ABaseGeometryActor::OnTimerFire, NewTimerRate, true );
+	else
+		TimerManager.ClearTimer( TimerHandle );
+}
+
 void ABaseGeometryActor::OnTimerFire()
 {
-	const FLinearColor NewColor = FLinearColor::MakeRandomColor();
-	SetColor( NewColor );
+	if( ++TimerCount <= MaxTimerCount )
+	{
+		const FLinearColor NewColor = FLinearColor::MakeRandomColor();
+		SetColor( NewColor );
+		OnColorChanged.Broadcast( NewColor, GetName() );
+	}
+	else
+	{
+		GetWorldTimerManager().ClearTimer( TimerHandle );
+		OnTimerFinished.Broadcast( this );
+	}
 }

@@ -9,9 +9,11 @@
 
 #include "GeometryHubActor.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN( LogGeometryHub, All, All )
+
 USTRUCT( BlueprintType )
 struct FGeometryPayload
-{
+{  
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY( EditAnywhere )
@@ -58,5 +60,11 @@ private:
 	ABaseGeometryActor* GeometryObject;
 
 	void SpawnActors();
+
+	UFUNCTION()
+	void OnColorChanged( const FLinearColor& color, const FString& Name );
+
+
+	void OnTimerFinished( AActor* Actor );
 
 };
