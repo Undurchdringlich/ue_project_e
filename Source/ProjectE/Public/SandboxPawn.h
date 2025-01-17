@@ -6,6 +6,9 @@
 #include "GameFramework/Pawn.h"
 #include "SandboxPawn.generated.h"
 
+class UStaticMeshComponent;
+class UCameraComponent;
+
 DECLARE_LOG_CATEGORY_EXTERN( LogSandBoxPawn, All, All )
 
 UCLASS()
@@ -20,8 +23,17 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* SceneComponent;
 
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* StaticMeshComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* CameraComponent;
+
 	UPROPERTY(EditAnywhere)
 	float Velocity = 300.0f;
+
+	virtual void PossessedBy( AController* NewController ) override;
+	virtual void UnPossessed() override;
 
 protected:
 	// Called when the game starts or when spawned
