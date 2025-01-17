@@ -3,8 +3,10 @@
 
 #include "GameModeBaseProjectE.h"
 #include "SandboxPawn.h"
+#include "SandBoxPlayerController.h"
 
 AGameModeBaseProjectE::AGameModeBaseProjectE()
 {
     DefaultPawnClass = ASandboxPawn::StaticClass();
+    PlayerControllerClass = ASandBoxPlayerController::StaticClass();
 }
